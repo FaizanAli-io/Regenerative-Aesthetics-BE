@@ -1,18 +1,19 @@
+import { UserEntity } from './../../users/entities/user.entity';
+import { ReviewEntity } from './../../reviews/entities/review.entity';
 import { CategoryEntity } from './../../categories/entities/category.entity';
 import { OrdersProductsEntity } from './../../orders/entities/orders-products.entity';
-import { ReviewEntity } from './../../reviews/entities/review.entity';
-import { UserEntity } from './../../users/entities/user.entity';
 import { WishlistItemEntity } from './../../wishlists/entities/wishlists-items.entity';
 import {
-  Column,
-  CreateDateColumn,
   Entity,
-  ManyToOne,
+  Column,
   OneToMany,
-  PrimaryGeneratedColumn,
+  ManyToOne,
   Timestamp,
+  CreateDateColumn,
   UpdateDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+
 @Entity({ name: 'products' })
 export class ProductEntity {
   @PrimaryGeneratedColumn()
@@ -45,20 +46,17 @@ export class ProductEntity {
   @ManyToOne(
     () => CategoryEntity,
     (category) => category.products,
-    {
-      nullable: true,
-      onDelete: 'SET NULL', // Set the category ID to null when the category is deleted
-    },
+    { onDelete: 'SET NULL', nullable: true },
   )
   category: CategoryEntity | null;
   @OneToMany(
     () => ReviewEntity,
-    (rev) => rev.product,
+    (review) => review.product,
   )
   reviews: ReviewEntity[];
   @OneToMany(
     () => OrdersProductsEntity,
-    (op) => op.product,
+    (orderproduct) => orderproduct.product,
   )
   products: OrdersProductsEntity[];
   @OneToMany(
