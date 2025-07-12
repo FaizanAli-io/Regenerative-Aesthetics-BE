@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateGuestOrderDto } from './dto/create-guest-order.dto';
 import { AuthenticationGuard } from './../utility/common/guards/authentication.guard';
 import { CurrentUser } from './../utility/common/decorators/current-user.decorator';
 import { UserEntity } from './../users/entities/user.entity';
@@ -55,6 +56,26 @@ export class OrdersController {
     return await this.ordersService.create(
       createOrderDto,
       currentUser,
+    );
+  }
+
+  @Post('guest')
+  @ApiOperation({
+    summary:
+      'Create a new guest order (no authentication required)',
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'The guest order has been successfully created.',
+    type: OrderEntity,
+  })
+  async createGuestOrder(
+    @Body()
+    createGuestOrderDto: CreateGuestOrderDto,
+  ): Promise<OrderEntity | null> {
+    return await this.ordersService.createGuestOrder(
+      createGuestOrderDto,
     );
   }
   // ADMIN: Get all orders

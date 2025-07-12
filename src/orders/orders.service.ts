@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateGuestOrderDto } from './dto/create-guest-order.dto';
 import { UserEntity } from './../users/entities/user.entity';
 import {
   InjectEntityManager,
@@ -24,8 +25,6 @@ import { ProductsService } from './../products/products.service';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrderStatus } from './enum/order-status.enum';
 import { UsersService } from './../users/users.service';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { OrderedProductsDto } from './dto/ordered-products.dto';
 import { CreateShippingDto } from './dto/create-shipping.dto';
 import { EmailsService } from './../emails/emails.service';
@@ -111,6 +110,91 @@ export class OrdersService {
               ],
             },
           );
+        return fullOrder;
+      },
+    );
+  }
+
+  async createGuestOrder(
+    createGuestOrderDto: CreateGuestOrderDto,
+  ): Promise<OrderEntity | null> {
+    return this.manager.transaction(
+      async (transactionalEntityManager) => {
+        // Create and save shipping address
+        const shippingEntity =
+          new ShippingEntity();
+        Object.assign(
+          shippingEntity,
+          createGuestOrderDto.shippingAddress,
+        );
+        // Create order entity without user
+        const orderEntity = new OrderEntity();
+        orderEntity.shippingAddress =
+          shippingEntity;
+        orderEntity.user = null; // No user for guest orders
+        // Save order within transaction
+        const orderTbl =
+          await transactionalEntityManager.save(
+            orderEntity,
+          );
+        // Prepare order-product relationships
+        const opEntities: Partial<OrdersProductsEntity>[] =
+          [];
+        for (const productDto of createGuestOrderDto.products) {
+          const product =
+            await this.productService.findOne(
+              productDto.id,
+            );
+          // Check product availability
+          if (
+            product.stock <
+            productDto.product_quantity
+          ) {
+            throw new BadRequestException(
+              `Product ${product.id} is out of stock.`,
+            );
+          }
+          // Build order-product entry
+          opEntities.push({
+            order: orderTbl,
+            product: product,
+            product_quantity:
+              productDto.product_quantity,
+            product_unit_price: product.price,
+          });
+        }
+        // Save all order-product relationships
+        await transactionalEntityManager.save(
+          OrdersProductsEntity,
+          opEntities,
+        );
+        // Fetch complete order with relations
+        const fullOrder =
+          await transactionalEntityManager.findOne(
+            OrderEntity,
+            {
+              where: { id: orderTbl.id },
+              relations: [
+                'shippingAddress',
+                'user',
+                'products',
+                'products.product',
+              ],
+            },
+          );
+
+        // Send order confirmation email to guest
+        if (
+          createGuestOrderDto.customerEmail &&
+          fullOrder
+        ) {
+          await this.emailService.sendOrderStatusEmail(
+            createGuestOrderDto.customerEmail,
+            fullOrder.id,
+            'processing',
+          );
+        }
+
         return fullOrder;
       },
     );
@@ -241,29 +325,31 @@ export class OrdersService {
     }
     // 🚀 Send status change email
     const newStatus = updateOrderStatusDto.status;
-    const userEmail = order.user.email;
-    if (newStatus === OrderStatus.PROCESSING) {
-      await this.emailService.sendOrderStatusEmail(
-        userEmail,
-        order.id,
-        'processing',
-      );
-    } else if (
-      newStatus === OrderStatus.SHIPPED
-    ) {
-      await this.emailService.sendOrderStatusEmail(
-        userEmail,
-        order.id,
-        'shipped',
-      );
-    } else if (
-      newStatus === OrderStatus.DELIVERED
-    ) {
-      await this.emailService.sendOrderStatusEmail(
-        userEmail,
-        order.id,
-        'delivered',
-      );
+    const userEmail = order.user?.email;
+    if (userEmail) {
+      if (newStatus === OrderStatus.PROCESSING) {
+        await this.emailService.sendOrderStatusEmail(
+          userEmail,
+          order.id,
+          'processing',
+        );
+      } else if (
+        newStatus === OrderStatus.SHIPPED
+      ) {
+        await this.emailService.sendOrderStatusEmail(
+          userEmail,
+          order.id,
+          'shipped',
+        );
+      } else if (
+        newStatus === OrderStatus.DELIVERED
+      ) {
+        await this.emailService.sendOrderStatusEmail(
+          userEmail,
+          order.id,
+          'delivered',
+        );
+      }
     }
     return order;
   }
@@ -282,11 +368,13 @@ export class OrdersService {
       order,
       OrderStatus.CANCELLED,
     );
-    await this.emailService.sendOrderStatusEmail(
-      order.user.email,
-      order.id,
-      'cancelled',
-    );
+    if (order.user?.email) {
+      await this.emailService.sendOrderStatusEmail(
+        order.user.email,
+        order.id,
+        'cancelled',
+      );
+    }
     return order;
   }
   async remove(id: number) {
