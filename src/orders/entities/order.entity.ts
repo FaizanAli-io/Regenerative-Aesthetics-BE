@@ -65,6 +65,7 @@ export class OrderEntity {
   @ManyToOne(
     () => UserEntity,
     (user) => user.orders,
+    { nullable: true }
   )
-  user: UserEntity;
+  user: UserEntity | null;
 }
