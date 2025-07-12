@@ -528,6 +528,66 @@ export class OrdersService {
       message: 'Product removed from cart',
     };
   }
+
+  async updateCartQuantity(
+    productId: number,
+    quantity: number,
+    user: UserEntity,
+  ) {
+    // Get user's cart
+    const cart = await this.getOrCreateUserCart(
+      user.id,
+    );
+
+    // Find the product in the cart
+    const orderedProduct = cart.products.find(
+      (p) => p.product.id === productId,
+    );
+
+    if (!orderedProduct) {
+      throw new NotFoundException(
+        'Product not found in cart',
+      );
+    }
+
+    // Check if requested quantity is available in stock
+    const product =
+      await this.productService.findOne(
+        productId,
+      );
+    if (product.stock < quantity) {
+      throw new BadRequestException(
+        `Only ${product.stock} units available in stock`,
+      );
+    }
+
+    // Update quantity
+    orderedProduct.product_quantity = quantity;
+    await this.opRepository.save(orderedProduct);
+
+    // Fetch updated cart
+    const updatedCart =
+      await this.getOrCreateUserCart(user.id);
+
+    // Calculate total price and return cart without circular references
+    const totalPrice =
+      updatedCart.products.reduce(
+        (sum, product) =>
+          sum +
+          product.product_unit_price *
+            product.product_quantity,
+        0,
+      );
+
+    return {
+      ...updatedCart,
+      totalPrice,
+      products: updatedCart.products.map(
+        ({ order, ...rest }) => rest,
+      ), // Remove circular ref
+    };
+  }
+
   async checkout(
     createShippingDto: CreateShippingDto,
     currentUser: UserEntity,

@@ -28,9 +28,10 @@ import { AuthorizeGuard } from './../utility/common/guards/authorization.guard';
 import { Roles } from './../utility/common/user-roles.enum';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { OrderedProductsDto } from './dto/ordered-products.dto';
 import { CreateShippingDto } from './dto/create-shipping.dto';
+import { UpdateCartQuantityDto } from './dto/update-cart.dto';
+
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
@@ -78,7 +79,7 @@ export class OrdersController {
       createGuestOrderDto,
     );
   }
-  // ADMIN: Get all orders
+
   @Get('all')
   @UseGuards(
     AuthenticationGuard,
@@ -116,7 +117,7 @@ export class OrdersController {
       status,
     );
   }
-  // USER: Get own orders
+
   @Get()
   @UseGuards(
     AuthenticationGuard,
@@ -317,6 +318,31 @@ export class OrdersController {
       currentUser,
     );
   }
+
+  @UseGuards(AuthenticationGuard)
+  @Patch('cart/quantity')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Update quantity of a product in the cart',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'The product quantity has been successfully updated in the cart.',
+  })
+  async updateCartQuantity(
+    @Body()
+    updateCartQuantityDto: UpdateCartQuantityDto,
+    @CurrentUser() currentUser: UserEntity,
+  ) {
+    return this.ordersService.updateCartQuantity(
+      updateCartQuantityDto.productId,
+      updateCartQuantityDto.quantity,
+      currentUser,
+    );
+  }
+
   @UseGuards(AuthenticationGuard)
   @Post('cart/checkout')
   @ApiBearerAuth()
