@@ -1,4 +1,4 @@
-ssh -i regen-be.pem ubuntu@13.60.9.207
+ssh -i regen-be.pem ubuntu@16.171.129.112
 
 cd Regenerative-Aesthetics-BE/
 
@@ -7,9 +7,5 @@ git pull origin
 
 npm install
 
-pm2 restart all
+pm2 start dist/src/main.js --name regen-be
 
-Launch commands for pm2:
-
-- pm2 start npm --name nest-be -- run start
-- pm2 start ./start-ngrok.sh --name ngrok

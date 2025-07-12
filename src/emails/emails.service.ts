@@ -21,8 +21,7 @@ export class EmailsService {
     email: string,
     token: string,
   ): Promise<void> {
-    // const verificationUrl = `${process.env.APP_URL}/users/verify-email?token=${token}`;
-    const verificationUrl = `http://localhost:3001/verify-email/${token}`;
+    const verificationUrl = `${process.env.BE_URL}/verify-email/${token}`;
 
     const mailOptions = {
       from: `"Regenerative Aesthetics" <${process.env.GMAIL_USER}>`,
@@ -57,8 +56,7 @@ export class EmailsService {
     email: string,
     token: string,
   ): Promise<void> {
-    const resetUrl = `http://localhost:3001/reset-password/${token}`;
-    // const resetUrl = `${process.env.APP_URL}/reset-password?token=${token}`;
+    const resetUrl = `${process.env.BE_URL}/reset-password/${token}`;
 
     const mailOptions = {
       from: `"Regenerative Aesthetics" <${process.env.GMAIL_USER}>`,
