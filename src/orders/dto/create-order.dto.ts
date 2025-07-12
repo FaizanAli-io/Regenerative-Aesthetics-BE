@@ -10,6 +10,7 @@ export class CreateOrderDto {
     type: () => CreateShippingDto,
     example: {
       phone: '+1234567890',
+      name: 'John Doe',
       address: '123 Main St',
       city: 'New York',
       postalCode: '10001',

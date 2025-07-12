@@ -1,19 +1,29 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateOrderDto } from './create-order.dto';
 
 export class CreateGuestOrderDto extends CreateOrderDto {
   @ApiProperty({
-    description: 'Customer email address for order notifications',
+    description:
+      'Customer email address for order notifications',
     example: 'customer@example.com',
     required: true,
   })
   @IsNotEmpty({
     message: 'Email cannot be empty',
   })
-  @IsEmail({}, {
-    message: 'Please provide a valid email address',
-  })
+  @IsEmail(
+    {},
+    {
+      message:
+        'Please provide a valid email address',
+    },
+  )
   customerEmail: string;
 
   @ApiProperty({

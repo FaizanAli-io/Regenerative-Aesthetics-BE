@@ -25,8 +25,6 @@ import { ProductsService } from './../products/products.service';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrderStatus } from './enum/order-status.enum';
 import { UsersService } from './../users/users.service';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
 import { OrderedProductsDto } from './dto/ordered-products.dto';
 import { CreateShippingDto } from './dto/create-shipping.dto';
 import { EmailsService } from './../emails/emails.service';
@@ -184,16 +182,19 @@ export class OrdersService {
               ],
             },
           );
-        
+
         // Send order confirmation email to guest
-        if (createGuestOrderDto.customerEmail && fullOrder) {
+        if (
+          createGuestOrderDto.customerEmail &&
+          fullOrder
+        ) {
           await this.emailService.sendOrderStatusEmail(
             createGuestOrderDto.customerEmail,
             fullOrder.id,
             'processing',
           );
         }
-        
+
         return fullOrder;
       },
     );

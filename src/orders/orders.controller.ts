@@ -60,7 +60,10 @@ export class OrdersController {
   }
 
   @Post('guest')
-  @ApiOperation({ summary: 'Create a new guest order (no authentication required)' })
+  @ApiOperation({
+    summary:
+      'Create a new guest order (no authentication required)',
+  })
   @ApiResponse({
     status: 201,
     description:
