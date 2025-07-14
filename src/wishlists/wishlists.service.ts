@@ -135,4 +135,64 @@ export class WishlistsService {
       });
     return !!exists;
   }
+
+  async getAllUsersWishlists(
+    query: any,
+  ): Promise<{
+    wishlistItems: any[];
+    totalItems: number;
+    limit: number;
+  }> {
+    const limit = query.limit || 10;
+    const queryBuilder = this.wishlistRepository
+      .createQueryBuilder('wishlistItem')
+      .leftJoinAndSelect(
+        'wishlistItem.product',
+        'product',
+      )
+      .leftJoinAndSelect(
+        'wishlistItem.user',
+        'user',
+      )
+      .orderBy('wishlistItem.createdAt', 'DESC');
+
+    const totalItems =
+      await queryBuilder.getCount();
+
+    if (query.search) {
+      queryBuilder.andWhere(
+        '(product.title ILIKE :search OR user.email ILIKE :search)',
+        { search: `%${query.search}%` },
+      );
+    }
+
+    if (query.userId) {
+      queryBuilder.andWhere('user.id = :userId', {
+        userId: query.userId,
+      });
+    }
+
+    queryBuilder.take(limit);
+    if (query.offset)
+      queryBuilder.skip(query.offset);
+
+    const wishlistItems =
+      await queryBuilder.getMany();
+
+    return {
+      wishlistItems: wishlistItems.map(
+        (item) => ({
+          ...item,
+          product: item.product,
+          user: {
+            id: item.user.id,
+            email: item.user.email,
+            name: item.user.name,
+          },
+        }),
+      ),
+      totalItems,
+      limit,
+    };
+  }
 }

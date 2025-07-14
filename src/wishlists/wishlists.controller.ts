@@ -14,11 +14,13 @@ import {
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { WishlistsService } from './wishlists.service';
 import { UserEntity } from './../users/entities/user.entity';
 import { AuthenticationGuard } from './../utility/common/guards/authentication.guard';
 import { CurrentUser } from './../utility/common/decorators/current-user.decorator';
+
 @ApiTags('Wishlists')
 @Controller('wishlists')
 export class WishlistsController {
@@ -133,6 +135,59 @@ export class WishlistsController {
     return await this.wishlistsService.checkIfWishlisted(
       currentUser.id,
       productId,
+    );
+  }
+
+  @Get('all')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Get all users wishlists (Admin only)',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Returns a list of all users wishlists.',
+  })
+  @ApiResponse({
+    status: 401,
+    description:
+      'Unauthorized - Admin access required.',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description:
+      'Number of items to return per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'offset',
+    required: false,
+    type: Number,
+    description:
+      'Number of items to skip for pagination',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description:
+      'Search term to filter by product title or user email',
+  })
+  @ApiQuery({
+    name: 'userId',
+    required: false,
+    type: Number,
+    description:
+      'Filter wishlists for a specific user ID',
+  })
+  async getAllUsersWishlists(
+    @Query()
+    query: any,
+  ) {
+    return await this.wishlistsService.getAllUsersWishlists(
+      query,
     );
   }
 }
