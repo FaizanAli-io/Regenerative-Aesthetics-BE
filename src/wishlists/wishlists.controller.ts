@@ -1,25 +1,27 @@
 import {
-  Controller,
-  Post,
   Get,
-  Delete,
-  UseGuards,
+  Post,
+  Body,
   Query,
   Param,
-  Body,
+  Delete,
+  UseGuards,
+  Controller,
   ParseIntPipe,
 } from '@nestjs/common';
+
 import {
-  ApiOperation,
-  ApiResponse,
   ApiTags,
-  ApiBearerAuth,
   ApiQuery,
+  ApiResponse,
+  ApiOperation,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+
 import { WishlistsService } from './wishlists.service';
-import { UserEntity } from './../users/entities/user.entity';
-import { AuthenticationGuard } from './../utility/common/guards/authentication.guard';
-import { CurrentUser } from './../utility/common/decorators/current-user.decorator';
+import { UserEntity } from '../users/entities/user.entity';
+import { CurrentUser } from '../utility/common/decorators/current-user.decorator';
+import { AuthenticationGuard } from '../utility/common/guards/authentication.guard';
 
 @ApiTags('Wishlists')
 @Controller('wishlists')

@@ -1,36 +1,42 @@
 import {
-  Controller,
   Get,
+  Put,
   Post,
   Body,
+  Query,
   Patch,
   Param,
   Delete,
   UseGuards,
-  Put,
-  Query,
+  Controller,
   ParseIntPipe,
 } from '@nestjs/common';
+
 import {
-  ApiOperation,
-  ApiResponse,
   ApiTags,
+  ApiResponse,
+  ApiOperation,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { CreateGuestOrderDto } from './dto/create-guest-order.dto';
-import { AuthenticationGuard } from './../utility/common/guards/authentication.guard';
-import { CurrentUser } from './../utility/common/decorators/current-user.decorator';
-import { UserEntity } from './../users/entities/user.entity';
-import { OrderEntity } from './entities/order.entity';
-import { AuthorizeGuard } from './../utility/common/guards/authorization.guard';
 import { Roles } from './../utility/common/user-roles.enum';
-import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { CreateCartDto } from './dto/create-cart.dto';
-import { OrderedProductsDto } from './dto/ordered-products.dto';
-import { CreateShippingDto } from './dto/create-shipping.dto';
-import { UpdateCartQuantityDto } from './dto/update-cart.dto';
+import { AuthorizeGuard } from './../utility/common/guards/authorization.guard';
+import { CurrentUser } from './../utility/common/decorators/current-user.decorator';
+import { AuthenticationGuard } from './../utility/common/guards/authentication.guard';
+
+import { OrderEntity } from './entities/order.entity';
+import { UserEntity } from './../users/entities/user.entity';
+
+import {
+  CreateCartDto,
+  CreateOrderDto,
+  CreateShippingDto,
+  OrderedProductsDto,
+  CreateGuestOrderDto,
+  UpdateOrderStatusDto,
+  UpdateCartQuantityDto,
+} from './dto';
 
 @ApiTags('Orders')
 @Controller('orders')

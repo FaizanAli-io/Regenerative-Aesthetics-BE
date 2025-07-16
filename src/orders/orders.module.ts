@@ -1,22 +1,26 @@
 import {
-  forwardRef,
   Module,
+  forwardRef,
 } from '@nestjs/common';
+
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
+
 import { OrderEntity } from './entities/order.entity';
-import { OrdersProductsEntity } from './entities/orders-products.entity';
 import { ShippingEntity } from './entities/shipping.entity';
-import { ProductsModule } from './../products/products.module';
+import { OrdersProductsEntity } from './entities/orders-products.entity';
+
 import { UsersModule } from './../users/users.module';
 import { EmailsModule } from './../emails/emails.module';
+import { ProductsModule } from './../products/products.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       OrderEntity,
-      OrdersProductsEntity,
       ShippingEntity,
+      OrdersProductsEntity,
     ]),
     forwardRef(() => ProductsModule),
     UsersModule,

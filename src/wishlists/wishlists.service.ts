@@ -3,19 +3,21 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+
 import {
-  DeleteResult,
   Repository,
+  DeleteResult,
 } from 'typeorm';
-import { ProductEntity } from './../products/entities/product.entity';
+
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductEntity } from '../products/entities/product.entity';
 import { WishlistItemEntity } from './entities/wishlists-items.entity';
+
 @Injectable()
 export class WishlistsService {
   constructor(
     @InjectRepository(WishlistItemEntity)
     private readonly wishlistRepository: Repository<WishlistItemEntity>,
-    // Change this line:
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
   ) {}

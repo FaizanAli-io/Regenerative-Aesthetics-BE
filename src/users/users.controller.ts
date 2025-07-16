@@ -1,34 +1,41 @@
 import {
-  Controller,
   Get,
   Post,
   Body,
+  Query,
   Patch,
   Param,
-  NotFoundException,
-  UseGuards,
-  Query,
-  ParseIntPipe,
   Delete,
+  UseGuards,
+  Controller,
+  ParseIntPipe,
+  NotFoundException,
 } from '@nestjs/common';
+
 import {
-  ApiOperation,
-  ApiResponse,
   ApiTags,
+  ApiResponse,
+  ApiOperation,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+
+import {
+  UpdateUserDto,
+  UserSignUpDto,
+  UserSignInDto,
+  AddContactDetailsDto,
+  UpdateContactDetailsDto,
+} from './dto';
+
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserSignUpDto } from './dto/user-signup.dto';
 import { UserEntity } from './entities/user.entity';
-import { UserSignInDto } from './dto/user-signin.dto';
-import { CurrentUser } from './../utility/common/decorators/current-user.decorator';
-import { AuthenticationGuard } from './../utility/common/guards/authentication.guard';
-import { Roles } from './../utility/common/user-roles.enum';
-import { AuthorizeGuard } from './../utility/common/guards/authorization.guard';
-import { AddContactDetailsDto } from './dto/add-contact-details.dto';
+import { Roles } from '../utility/common/user-roles.enum';
 import { AddressBookEntity } from './entities/address-book.entity';
-import { UpdateContactDetailsDto } from './dto/update-contact-details.dto';
+
+import { AuthorizeGuard } from '../utility/common/guards/authorization.guard';
+import { CurrentUser } from '../utility/common/decorators/current-user.decorator';
+import { AuthenticationGuard } from '../utility/common/guards/authentication.guard';
+
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {

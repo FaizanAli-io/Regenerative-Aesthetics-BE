@@ -1,21 +1,27 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity';
-import { MoreThan, Repository } from 'typeorm';
-import { UserSignUpDto } from './dto/user-signup.dto';
-import { hash, compare } from 'bcrypt';
-import { UserSignInDto } from './dto/user-signin.dto';
-import { sign } from 'jsonwebtoken';
-import { EmailsService } from './../emails/emails.service';
+
 import * as crypto from 'crypto';
-import { AddContactDetailsDto } from './dto/add-contact-details.dto';
+import { sign } from 'jsonwebtoken';
+import { hash, compare } from 'bcrypt';
+import { MoreThan, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import {
+  UpdateUserDto,
+  UserSignUpDto,
+  UserSignInDto,
+  AddContactDetailsDto,
+  UpdateContactDetailsDto,
+} from './dto';
+
+import { UserEntity } from './entities/user.entity';
+import { EmailsService } from '../emails/emails.service';
 import { AddressBookEntity } from './entities/address-book.entity';
-import { UpdateContactDetailsDto } from './dto/update-contact-details.dto';
+
 @Injectable()
 export class UsersService {
   constructor(

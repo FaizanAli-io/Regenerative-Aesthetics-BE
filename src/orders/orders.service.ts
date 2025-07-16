@@ -1,33 +1,40 @@
 import {
-  BadRequestException,
-  forwardRef,
   Inject,
   Injectable,
+  forwardRef,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { CreateGuestOrderDto } from './dto/create-guest-order.dto';
-import { UserEntity } from './../users/entities/user.entity';
+
 import {
-  InjectEntityManager,
   InjectRepository,
+  InjectEntityManager,
 } from '@nestjs/typeorm';
-import { OrderEntity } from './entities/order.entity';
+
 import {
-  EntityManager,
-  Repository,
   Timestamp,
+  Repository,
+  EntityManager,
 } from 'typeorm';
-import { OrdersProductsEntity } from './entities/orders-products.entity';
+
+import { OrderEntity } from './entities/order.entity';
 import { ShippingEntity } from './entities/shipping.entity';
+import { UserEntity } from './../users/entities/user.entity';
 import { ProductEntity } from './../products/entities/product.entity';
-import { ProductsService } from './../products/products.service';
-import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { OrdersProductsEntity } from './entities/orders-products.entity';
+
 import { OrderStatus } from './enum/order-status.enum';
-import { UsersService } from './../users/users.service';
-import { OrderedProductsDto } from './dto/ordered-products.dto';
-import { CreateShippingDto } from './dto/create-shipping.dto';
 import { EmailsService } from './../emails/emails.service';
+import { ProductsService } from './../products/products.service';
+
+import {
+  CreateOrderDto,
+  CreateShippingDto,
+  OrderedProductsDto,
+  CreateGuestOrderDto,
+  UpdateOrderStatusDto,
+} from './dto';
+
 @Injectable()
 export class OrdersService {
   constructor(
@@ -39,7 +46,6 @@ export class OrdersService {
     private readonly opRepository: Repository<OrdersProductsEntity>,
     @Inject(forwardRef(() => ProductsService))
     private readonly productService: ProductsService,
-    private readonly userService: UsersService,
     private readonly emailService: EmailsService,
   ) {}
   async create(
