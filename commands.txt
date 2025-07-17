@@ -4,8 +4,5 @@ cd Regenerative-Aesthetics-BE/
 
 git fetch
 git pull origin
-
-npm install
-
-pm2 start dist/src/main.js --name regen-be
-
+npm run build
+pm2 restart all

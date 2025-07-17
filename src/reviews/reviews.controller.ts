@@ -74,8 +74,8 @@
 //     return this.reviewsService.remove(+id);
 //   }
 // }
+
 import {
-  Controller,
   Get,
   Post,
   Body,
@@ -83,23 +83,28 @@ import {
   Param,
   Delete,
   UseGuards,
+  Controller,
 } from '@nestjs/common';
+
 import {
-  ApiOperation,
-  ApiResponse,
   ApiTags,
+  ApiResponse,
+  ApiOperation,
   ApiBearerAuth,
-  ApiProperty,
 } from '@nestjs/swagger';
+
 import { ReviewsService } from './reviews.service';
+import { ReviewEntity } from './entities/review.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { AuthenticationGuard } from './../utility/common/guards/authentication.guard';
-import { CurrentUser } from './../utility/common/decorators/current-user.decorator';
+
 import { UserEntity } from './../users/entities/user.entity';
-import { ReviewEntity } from './entities/review.entity';
-import { AuthorizeGuard } from './../utility/common/guards/authorization.guard';
+import { CurrentUser } from './../utility/common/decorators/current-user.decorator';
+
 import { Roles } from './../utility/common/user-roles.enum';
+import { AuthorizeGuard } from './../utility/common/guards/authorization.guard';
+import { AuthenticationGuard } from './../utility/common/guards/authentication.guard';
+
 @ApiTags('Reviews')
 @Controller('reviews')
 export class ReviewsController {
@@ -129,7 +134,8 @@ export class ReviewsController {
       currentUser,
     );
   }
-  @Get('all')
+
+  @Get()
   @ApiOperation({ summary: 'Get all reviews' })
   @ApiResponse({
     status: 200,
@@ -139,24 +145,7 @@ export class ReviewsController {
   async findAll(): Promise<ReviewEntity[]> {
     return await this.reviewsService.findAll();
   }
-  @Get()
-  @ApiOperation({
-    summary: 'Get reviews by product ID',
-  })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Returns reviews for a specific product.',
-    type: [ReviewEntity],
-  })
-  async findAllByProduct(
-    @Body('productId')
-    productId: number,
-  ): Promise<ReviewEntity[]> {
-    return await this.reviewsService.findAllByProduct(
-      +productId,
-    );
-  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a review by ID' })
   @ApiResponse({
@@ -174,6 +163,7 @@ export class ReviewsController {
   ): Promise<ReviewEntity> {
     return await this.reviewsService.findOne(+id);
   }
+
   @UseGuards(AuthenticationGuard)
   @Patch(':id')
   @ApiBearerAuth()
@@ -200,6 +190,7 @@ export class ReviewsController {
       currentUser,
     );
   }
+
   @UseGuards(
     AuthenticationGuard,
     AuthorizeGuard([Roles.ADMIN]),
@@ -223,5 +214,24 @@ export class ReviewsController {
     id: string,
   ) {
     return this.reviewsService.remove(+id);
+  }
+
+  @Get('product/:id')
+  @ApiOperation({
+    summary: 'Get reviews by product ID',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Returns reviews for a specific product.',
+    type: [ReviewEntity],
+  })
+  async findAllByProduct(
+    @Param('id')
+    productId: string,
+  ): Promise<ReviewEntity[]> {
+    return await this.reviewsService.findAllByProduct(
+      +productId,
+    );
   }
 }
