@@ -20,6 +20,7 @@ export class ReviewsService {
     private readonly reviewRepository: Repository<ReviewEntity>,
     private readonly productService: ProductsService,
   ) {}
+
   async create(
     createReviewDto: CreateReviewDto,
     currentUser: UserEntity,
@@ -47,6 +48,21 @@ export class ReviewsService {
       review,
     );
   }
+
+  async findAllByUser(
+    userId: number,
+  ): Promise<ReviewEntity[]> {
+    return await this.reviewRepository.find({
+      where: { user: { id: userId } },
+      relations: {
+        user: true,
+        product: {
+          category: true,
+        },
+      },
+    });
+  }
+
   async findAll(): Promise<ReviewEntity[]> {
     return await this.reviewRepository.find({
       relations: {
@@ -57,11 +73,10 @@ export class ReviewsService {
       },
     });
   }
+
   async findAllByProduct(
     id: number,
   ): Promise<ReviewEntity[]> {
-    const product =
-      await this.productService.findOne(id);
     return await this.reviewRepository.find({
       where: { product: { id } },
       relations: {
@@ -72,6 +87,7 @@ export class ReviewsService {
       },
     });
   }
+
   async findOne(
     id: number,
   ): Promise<ReviewEntity> {
@@ -91,6 +107,7 @@ export class ReviewsService {
       );
     return review;
   }
+
   async update(
     id: number,
     updateReviewDto: UpdateReviewDto,
@@ -111,6 +128,7 @@ export class ReviewsService {
       review,
     );
   }
+
   async remove(id: number) {
     const review = await this.findOne(id);
     return this.reviewRepository.remove(review);

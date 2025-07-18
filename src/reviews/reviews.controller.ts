@@ -135,11 +135,35 @@ export class ReviewsController {
     );
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all reviews' })
+  @UseGuards(AuthenticationGuard)
+  @Get('')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Get all reviews of the current user',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Returns a list of all reviews.',
+    description:
+      'Returns all reviews created by the current user.',
+    type: [ReviewEntity],
+  })
+  async findAllByCurrentUser(
+    @CurrentUser() currentUser: UserEntity,
+  ): Promise<ReviewEntity[]> {
+    return await this.reviewsService.findAllByUser(
+      currentUser.id,
+    );
+  }
+
+  @Get('all')
+  @ApiOperation({
+    summary: 'Get all reviews of all users',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Returns a list of all reviews from all users.',
     type: [ReviewEntity],
   })
   async findAll(): Promise<ReviewEntity[]> {

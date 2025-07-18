@@ -1,4 +1,4 @@
-ssh -i regen-be.pem ubuntu@16.171.129.112
+ssh -i regen.pem ubuntu@16.171.129.112
 
 cd Regenerative-Aesthetics-BE/
 
